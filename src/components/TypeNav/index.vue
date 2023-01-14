@@ -1,47 +1,61 @@
-<!--登记为全局组件-->
 <template>
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="leaveIndex" @mouseenter="enterShow">
+      <div @mouseleave="leaveShow" @mouseenter="enterShow">
         <h2 class="all">全部商品分类</h2>
+        <!-- 过渡动画 -->
         <transition name="sort">
           <div class="sort" v-show="show">
-          <div class="all-sort-list2" @click="goSearch" >
-            <!--一级分类-->
-            <div
-              class="item"
-              v-for="(c1, index) in categoryList"
-              :key="c1.categoryID"
-              :class="{ cur: currentIndex === index }"
-            >
-              <h3 @mouseenter="changeIndex(index)">
-                <a :data-categoryName="c1.categoryName" :category1ID = "c1.categoryID">{{ c1.categoryName }}</a>
-              </h3>
-              <div class="item-list clearfix" :style="{display:currentIndex===index}">
-                <!--二级分类-->
-                <div
-                  class="subitem"
-                  v-for="(c2) in c1.categoryChild"
-                  :key="c2.categoryID"
+            <div class="all-sort-list2" @click="goSearch">
+              <div
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+              >
+                <h3
+                  :class="{ cur: currentIndex == index }"
+                  @mouseenter="changeIndex(index)"
                 >
-                  <dl class="fore">
-                    <dt>
-                      <a :data-categoryName="c2.categoryName" :category2ID = "c2.categoryID">{{ c2.categoryName }}</a>
-                    </dt>
-                    <dd>
-                      <!--三级分类-->
-                      <em
-                        v-for="(c3) in c2.categoryChild"
-                        :key="c3.categoryID"
-                      >
-                        <a :data-categoryName="c3.categoryName" :category3ID = "c3.categoryID">{{ c3.categoryName }}</a>
-                      </em>
-                    </dd>
-                  </dl>
+                  <a
+                    :data-categoryName="c1.categoryName"
+                    :data-category1Id="c1.categoryId"
+                    >{{ c1.categoryName }}</a
+                  >
+                </h3>
+                <div
+                  class="item-list clearfix"
+                  :style="{ display: currentIndex == index ? 'block' : 'none' }"
+                >
+                  <div class="subitem">
+                    <dl
+                      class="fore"
+                      v-for="(c2, index) in c1.categoryChild"
+                      :key="c2.categoryId"
+                    >
+                      <dt>
+                        <a
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
+                        >
+                      </dt>
+                      <dd>
+                        <em
+                          v-for="(c3, index) in c2.categoryChild"
+                          :key="c3.categoryId"
+                        >
+                          <a
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </div>
         </transition>
       </div>
@@ -60,76 +74,74 @@
 </template>
 
 <script>
-import { mapstate } from "vuex";
-import throttle from 'node_modules/lodash';
-
+import { mapState } from "vuex";
+import throttle from "lodash/throttle";
 export default {
-  name: "TypeNav",
-  data: {
-    currentIndex: -1,
-    show:true,
+  name: "typeNav",
+  data() {
+    return {
+      currentIndex: -1,
+      show: true,
+    };
   },
   mounted() {
-    //通知vuex发请求，获取数据，存储在仓库中
-    if(this.$route.path!='/home'){
+    if (this.$route.path != "/home") {
       this.show = false;
     }
   },
   computed: {
-    ...mapstate({
+    ...mapState({
       categoryList: (state) => state.home.categoryList,
     }),
   },
   methods: {
-    /** 
-    *一级分类索引,添加节流
-    */
-    changeIndex:throttle(function(index) {
+    changeIndex: throttle(function(index) {
       this.currentIndex = index;
-    }),
-    leaveIndex(){
+    }, 20),
+    goSearch(event) {
+      let node = event.target;
+      let {
+        categoryname,
+        category1id,
+        category2id,
+        category3id,
+      } = node.dataset;
+      if (categoryname) {
+        let location = { 
+            name: "search",
+            params,
+            query
+            };
+        let query = { 
+            category1Id:'',
+            category2Id:'',
+            category3Id:''
+            };
+        if (category1id) {
+          query.category1Id = category1id;
+        } else if (category2id) {
+          query.category2Id = category2id;
+        } else {
+          query.category3Id = category3id;
+        }
+        if (this.$route.params) {
+          location.params = this.$route.params;
+          location.query = query;
+          this.$router.push(location);
+        }
+      }
+    },
+    enterShow() {
+      if (this.$route.path != "/home") {
+        this.show = true;
+      }
+    },
+    leaveShow() {
       this.currentIndex = -1;
-      if(this.$route.path!='/home'){
+      if (this.$route.path != "/home") {
         this.show = false;
       }
     },
-    /**
-     * 页面路由跳转，传参
-     */
-    goSearch(event){
-      let element = event.target;
-      let {categoryname,category1ID,category2ID,category3ID} = element.dataset;
-      if(categoryname){
-        let location = {
-          name:'search',
-          query,
-          params,
-        };
-        let query = {
-          categoryName:categoryname,
-          category1ID,
-          category2ID,
-          category3ID,
-          };
-        if(category1ID){
-          query.category1ID = category1ID;
-        }
-        else if(category2ID){
-          query.category2ID = category2ID;
-        }
-        else if(category3ID){
-          query.category3ID = category3ID;
-        }
-        if(this.$route.params){
-          location.params = params;
-        }
-        location.query = query;
-        this.$router.push(location);
-      }
-    },
-    enterShow(){
-      this.show = true;
-    }
   },
 };
 </script>
@@ -188,6 +200,9 @@ export default {
             a {
               color: #333;
             }
+            &.cur {
+              background: skyblue;
+            }
           }
 
           .item-list {
@@ -244,21 +259,20 @@ export default {
             }
           }
         }
-        .cur {
-          background-color: skyblue;
-        }
       }
     }
-    //过渡动画开始
-    .sort-enter{
-      height:0px;
+    //过渡动画的样式
+    //过渡动画开始状态（进入）
+    .sort-enter {
+      height: 0px;
     }
-    //过渡动画结束
-    .sort-enter-to{
-      height:461px;
+    // 过渡动画结束状态（进入）
+    .sort-enter-to {
+      height: 461px;
     }
-    .sort-enter-active{
-      transition: all .5s linear;
+    // 定义动画时间、速率
+    .sort-enter-active {
+      transition: all 0.5s linear;
     }
   }
 }

@@ -16,7 +16,7 @@ request.interceptors.request.use((config)=>{
         config.headers.userTempId = store.state.detail.uuid_token;
     };
     if(store.state.user.token){
-        config.headers.tokrn = store.state.headers.token;
+        config.headers.token = store.state.headers.token;
     }
     nProgress.start();
     return config;
@@ -26,7 +26,7 @@ request.interceptors.response.use((res)=>{
     //进度条结束
     nProgress.done();
     return res.data;
-},(error)=>{
+},(err)=>{
     return Promise.reject(new Error('failed'));
 })
 export default request;

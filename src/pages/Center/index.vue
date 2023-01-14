@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import myOrder from './order'
   export default {
     name: '',
 

@@ -10,7 +10,7 @@ const mutations={
     },
 };
 const actions={
-    async getGoodsInfo(commit,skuId){
+    async getGoodsInfo({commit},skuId){
         let result = await reqGoodsInfo(skuId);
         if(result.code === 200){
             commit("REQFLOORMOCK",result.data);

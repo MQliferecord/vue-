@@ -2,17 +2,20 @@ import Vue from "vue";
 import Vuex from "vuex"
 Vue.use(Vuex);
 
-import home from "./home";
-import search from "./search";
-import detail from "./detail";
-import shopcart from "./shopcart";
+import home from "./home/index";
+import search from "./search/search";
+import detail from "./detail/detail";
+import shopcart from "./shopcart/shopcart";
 import user from "./user/user";
+import trade from "./trade/trade"
 
 export default new Vuex.Store({
-    home,
-    search,
-    detail,
-    shopcart,
-    user,
-    trade
+    modules: {
+        home,
+        search,
+        detail,
+        shopcart,
+        user,
+        trade
+    }
 })

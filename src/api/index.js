@@ -26,3 +26,4 @@ export const reqTradeInfo=()=>request({url:'/order/auth/trade',method:'get'});
 export const reqPayInfo=(data,tradeNo)=>request({url:`/order/auth/submitOrder?tradeNo=${tradeNo}`,method:'post',data});
 export const reqOrderPayInfo=(orderId)=>request({url:`/payment/weixin/createNative/${orderId}`,method:'get'});
 export const reqPayStatusInfo=(orderId)=>request({url:`/payment/weixin/queryPayStatus/${orderId}`,method:'get'});
+export const reqMyOrderList = (page,limit)=>request({url:`/order/auth/${page}/${limit}`,method:'get'});

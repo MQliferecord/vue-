@@ -15,6 +15,11 @@ export default {
     Header,
     Footer
   },
+  data(){
+    return{
+      msg:"abc"
+    }
+  },
   mounted(){
     this.$store.dispatch("categoryList");
   }
